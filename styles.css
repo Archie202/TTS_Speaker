@@ -109,6 +109,7 @@ textarea {
 .buttons {
     display: flex;
     justify-content: space-around;
+    margin-bottom: 20px; /* Added margin for spacing */
 }
 
 button {
@@ -120,10 +121,16 @@ button {
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
+    display: flex; /* Added to align icon and text vertically */
+    align-items: center; /* Added to align icon and text vertically */
 }
 
 button:hover {
     background-color: #0056b3;
+}
+
+button svg {
+    margin-right: 8px; /* Adjust icon margin */
 }
 
 audio {
