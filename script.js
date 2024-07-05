@@ -3,7 +3,7 @@ const voiceSelect = document.getElementById('voice-select');
 const languageSelect = document.getElementById('language-select');
 const pitchInput = document.getElementById('pitch');
 const rateInput = document.getElementById('rate');
-const speakBtn = document.getElementById('speak-btn');
+const generateBtn = document.getElementById('generate-btn');
 const downloadBtn = document.getElementById('download-btn');
 const testVoiceBtn = document.getElementById('test-voice-btn');
 const audio = document.getElementById('audio');
@@ -36,33 +36,14 @@ const updateRateValue = () => {
 pitchInput.addEventListener('input', updatePitchValue);
 rateInput.addEventListener('input', updateRateValue);
 
-speakBtn.addEventListener('click', () => {
+generateBtn.addEventListener('click', () => {
     const utterance = new SpeechSynthesisUtterance(textInput.value);
     const selectedVoice = voices[voiceSelect.value];
     utterance.voice = selectedVoice;
     utterance.lang = languageSelect.value;
     utterance.pitch = parseFloat(pitchInput.value);
     utterance.rate = parseFloat(rateInput.value);
-    synth.speak(utterance);
-});
 
-testVoiceBtn.addEventListener('click', () => {
-    const utterance = new SpeechSynthesisUtterance('Testing selected voice.');
-    utterance.voice = voices[voiceSelect.value];
-    utterance.lang = languageSelect.value;
-    utterance.pitch = parseFloat(pitchInput.value);
-    utterance.rate = parseFloat(rateInput.value);
-    synth.speak(utterance);
-});
-
-downloadBtn.addEventListener('click', () => {
-    const utterance = new SpeechSynthesisUtterance(textInput.value);
-    utterance.voice = voices[voiceSelect.value];
-    utterance.lang = languageSelect.value;
-    utterance.pitch = parseFloat(pitchInput.value);
-    utterance.rate = parseFloat(rateInput.value);
-
-    // Generate audio and handle playback and download
     const audioChunks = [];
     const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
     audioUrl = URL.createObjectURL(audioBlob);
@@ -84,6 +65,20 @@ downloadBtn.addEventListener('click', () => {
     synth.speak(utterance);
 });
 
+downloadBtn.addEventListener('click', () => {
+    if (!audioUrl) {
+        alert('Please generate audio first.');
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = audioUrl;
+    link.download = 'speech.mp3';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
 // Handle audio playback in the audio element
 audio.addEventListener('ended', () => {
     console.log('Playback ended');
@@ -91,4 +86,13 @@ audio.addEventListener('ended', () => {
 
 audio.addEventListener('error', (event) => {
     console.error('Audio error:', event);
+});
+
+testVoiceBtn.addEventListener('click', () => {
+    const utterance = new SpeechSynthesisUtterance('Testing selected voice.');
+    utterance.voice = voices[voiceSelect.value];
+    utterance.lang = languageSelect.value;
+    utterance.pitch = parseFloat(pitchInput.value);
+    utterance.rate = parseFloat(rateInput.value);
+    synth.speak(utterance);
 });
