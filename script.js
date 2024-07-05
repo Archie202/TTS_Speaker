@@ -10,6 +10,7 @@ const audio = document.getElementById('audio');
 
 let voices = [];
 const synth = window.speechSynthesis;
+let audioUrl = '';
 
 const populateVoiceList = () => {
     voices = synth.getVoices().sort((a, b) => a.name.localeCompare(b.name));
@@ -61,26 +62,19 @@ downloadBtn.addEventListener('click', () => {
     utterance.pitch = parseFloat(pitchInput.value);
     utterance.rate = parseFloat(rateInput.value);
 
-    // Generate audio and handle download
+    // Generate audio and handle playback and download
     const audioChunks = [];
     const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
-    const audioUrl = URL.createObjectURL(audioBlob);
+    audioUrl = URL.createObjectURL(audioBlob);
 
     utterance.onstart = () => {
         console.log('Speech started');
     };
 
     utterance.onend = () => {
-        const audioElement = new Audio(audioUrl);
-        audioElement.controls = true;
-        document.body.appendChild(audioElement);
-        
-        const link = document.createElement('a');
-        link.href = audioUrl;
-        link.download = 'speech.mp3';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        audio.src = audioUrl;
+        audio.controls = true;
+        audio.load();
     };
 
     utterance.onaudioprocess = (event) => {
