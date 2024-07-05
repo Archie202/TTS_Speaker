@@ -63,15 +63,20 @@ downloadBtn.addEventListener('click', () => {
 
     // Generate audio and handle download
     const audioChunks = [];
+    const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+    const audioUrl = URL.createObjectURL(audioBlob);
+
     utterance.onstart = () => {
         console.log('Speech started');
     };
 
     utterance.onend = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/mp3' });
-        const url = URL.createObjectURL(blob);
+        const audioElement = new Audio(audioUrl);
+        audioElement.controls = true;
+        document.body.appendChild(audioElement);
+        
         const link = document.createElement('a');
-        link.href = url;
+        link.href = audioUrl;
         link.download = 'speech.mp3';
         document.body.appendChild(link);
         link.click();
