@@ -40,8 +40,8 @@ speakBtn.addEventListener('click', () => {
     const selectedVoice = voices[voiceSelect.value];
     utterance.voice = selectedVoice;
     utterance.lang = languageSelect.value;
-    utterance.pitch = pitchInput.value;
-    utterance.rate = rateInput.value;
+    utterance.pitch = parseFloat(pitchInput.value);
+    utterance.rate = parseFloat(rateInput.value);
     synth.speak(utterance);
 });
 
@@ -49,8 +49,8 @@ testVoiceBtn.addEventListener('click', () => {
     const utterance = new SpeechSynthesisUtterance('Testing selected voice.');
     utterance.voice = voices[voiceSelect.value];
     utterance.lang = languageSelect.value;
-    utterance.pitch = pitchInput.value;
-    utterance.rate = rateInput.value;
+    utterance.pitch = parseFloat(pitchInput.value);
+    utterance.rate = parseFloat(rateInput.value);
     synth.speak(utterance);
 });
 
@@ -58,16 +58,17 @@ downloadBtn.addEventListener('click', () => {
     const utterance = new SpeechSynthesisUtterance(textInput.value);
     utterance.voice = voices[voiceSelect.value];
     utterance.lang = languageSelect.value;
-    utterance.pitch = pitchInput.value;
-    utterance.rate = rateInput.value;
+    utterance.pitch = parseFloat(pitchInput.value);
+    utterance.rate = parseFloat(rateInput.value);
 
+    // Generate audio and handle download
+    const audioChunks = [];
     utterance.onstart = () => {
-        audio.src = '';
-        audio.load();
+        console.log('Speech started');
     };
 
     utterance.onend = () => {
-        const blob = new Blob([utterance], { type: 'audio/mp3' });
+        const blob = new Blob(audioChunks, { type: 'audio/mp3' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -77,5 +78,18 @@ downloadBtn.addEventListener('click', () => {
         document.body.removeChild(link);
     };
 
+    utterance.onaudioprocess = (event) => {
+        audioChunks.push(event.inputBuffer.getChannelData(0));
+    };
+
     synth.speak(utterance);
+});
+
+// Handle audio playback in the audio element
+audio.addEventListener('ended', () => {
+    console.log('Playback ended');
+});
+
+audio.addEventListener('error', (event) => {
+    console.error('Audio error:', event);
 });
